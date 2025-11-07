@@ -11,21 +11,32 @@ library(readxl)
 library(lubridate)
 library(scales)
 
-setwd(r'(C:\Users\andre\Documents\cienciadatos\tp_final\data\raw)')
+setwd('https://github.com/dvivone/ciencia_de_datos_TP_final/tree/main/proyecto')
+
+data<-'data'
+outstub<-'outstub'
+
+archivo_datos_inflation<-"API_FP.CPI.TOTL.ZG_DS2_en_csv_v2_130173.csv"
+archivo_datos_gdp<-"API_NY.GDP.MKTP.KD.ZG_DS2_en_csv_v2_130026.csv"
+archivo_datps_unemp<-"API_SL.UEM.TOTL.ZS_DS2_en_csv_v2_130165.csv"
+
+path_inflation<-file.path(data,archivo_datos_inflation)
+path_gdp<-file.path(data,archivo_datos_gdp)
+path_unemp<-file.path(data,archivo_datos_unemp)
 
 ######CARGA DATOS######
 
 
-inflation <- read.csv('API_FP.CPI.TOTL.ZG_DS2_en_csv_v2_130173.csv',
+inflation <- read.csv(path_inflation)
                skip = 4,  # Ajusta este número: omite las primeras 2 filas
                header = TRUE 
 )
 
-gdp <- read.csv('API_NY.GDP.MKTP.KD.ZG_DS2_en_csv_v2_130026.csv',
+gdp <- read.csv(path_gdp,
                skip=4,
                header=TRUE)
 
-unemp <- read.csv('API_SL.UEM.TOTL.ZS_DS2_en_csv_v2_130165.csv',
+unemp <- read.csv(path_unemp,
                 skip=4,
                 header=TRUE)
 ###LIMPIEZA DATOS#####
