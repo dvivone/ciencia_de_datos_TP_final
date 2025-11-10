@@ -1,0 +1,33 @@
+# 1. Definir las estadísticas a calcular
+calcular_estadisticas <- list(
+  media = ~mean(., na.rm = TRUE),
+  mediana = ~median(., na.rm = TRUE),
+  sd = ~sd(., na.rm = TRUE),
+  min = ~min(., na.rm = TRUE),
+  max = ~max(., na.rm = TRUE),
+  q25 = ~quantile(., 0.25, na.rm = TRUE),
+  q75 = ~quantile(., 0.75, na.rm = TRUE)
+)
+
+# 2. Generar el resumen agrupado en formato ANCHO
+resumen_descriptivo_ancho <- datos_completos %>%
+  
+  # Agrupar por la variable de país (Country.Name)
+  group_by(Country.Name) %>%
+  
+  # Seleccionar las variables numéricas a resumir, excluyendo anio y dummies
+  select(where(is.numeric), -anio, -matches("is_outlier_"), -matches("Country.Name_ID")) %>% 
+  
+  # Calcular todas las estadísticas definidas para las variables agrupadas
+  summarise(
+    across(
+      .cols = everything(), 
+      .fns = calcular_estadisticas,
+      .names = "{.col}_{.fn}" # Nombrar la columna como variable_estadistica
+    ),
+    .groups = "drop" # Quitar la agrupación después de resumir
+  )
+
+# 3. Mostrar el resultado final
+print("📊 Resumen Descriptivo por País en Formato Ancho")
+resumen_descriptivo_ancho
