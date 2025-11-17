@@ -1,0 +1,37 @@
+library(tidyverse)
+library(VIM)          # Visualización de datos faltantes
+library(naniar)       # Exploración de NAs
+library(mice)         # Imputación múltiple
+
+setwd(r'(C:\Users\andre\Documents\cienciadatos\tp_final\data\raw)')
+data_paises <- read.csv("~/cienciadatos/tp_final/data/raw/data_paises.csv")
+
+
+###########Elección de años relevantes para el análisis#############
+
+
+names(data_paises)
+
+anios <- data_paises %>% group_by(anio) %>% summarise(obs_infla=sum(complete.cases(inflacion)),
+                                                      obs_gdp=sum(complete.cases(gdp)),
+                                                      obs_unemp=sum(complete.cases(unemp)))
+
+anios_con_ranking <- anios %>%
+  mutate(
+    rank_infla = rank(-obs_infla, na.last = "keep", ties.method = "min"),
+    rank_gdp=rank(-obs_gdp,na.last = "keep", ties.method = "min"),
+    rank_unemp=rank(-obs_unemp, na.last= "keep", ties.method="min")
+  ) %>%
+  arrange(desc(obs_infla))
+
+anio_max_infla <- anios_con_ranking$anio[1]
+
+cat("\nEl año con mayores observaciones de inflación es el", anio_max_infla, "\n")
+
+anio_no_cero_unemp <- anios_con_ranking %>%
+  filter(obs_unemp > 0) %>%
+  arrange(anio) %>% 
+  slice(1) %>%
+  pull(anio)
+
+cat("\nEl primer año con más de cero observaciones de desempleo es:", anio_no_cero_unemp, "\n")
