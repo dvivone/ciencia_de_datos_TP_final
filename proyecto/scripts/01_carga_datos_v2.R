@@ -1,24 +1,25 @@
-# Limpiar entorno
-rm(list = ls())
-
-# Configurar opciones globales
-options(stringsAsFactors = FALSE)
-options(scipen = 999)  # Evitar notación científica
-
 # Librerías del proyecto
 library(tidyverse)
 library(readxl)
 library(lubridate)
 library(scales)
 
-#setwd('https://github.com/dvivone/ciencia_de_datos_TP_final/tree/main/proyecto')
+# Limpiar entorno
+rm(list = ls())
 
-#data_clean<-'https://github.com/dvivone/ciencia_de_datos_TP_final/tree/main/proyecto/data/clean'
-#outstub<-'https://github.com/dvivone/ciencia_de_datos_TP_final/tree/main/proyecto/outstub'
+# Configurar opciones globales
+options(stringsAsFactors = FALSE)
+options(scipen = 999)  
 
+#Seter directorio de trabajo
 setwd(r'(C:\Users\d185436\Documents\GitHub\ciencia_de_datos_TP_final\proyecto)')
+
 data_clean<-file.path(r'(data/clean)')
-output<-'output'
+data_row<-file.path(r'(data/row)')
+data_processed<-file.path(r'(data/processed)')
+
+output_tables<-file.path(r'(output/tables)')
+output_figures<-file.path(r'(output/figures)')
 
 archivo_datos_inflation<-"API_FP.CPI.TOTL.ZG_DS2_en_csv_v2_130173.csv"
 archivo_datos_gdp<-"API_NY.GDP.MKTP.KD.ZG_DS2_en_csv_v2_130026.csv"
@@ -29,7 +30,6 @@ path_gdp<-file.path(data_clean,archivo_datos_gdp)
 path_unemp<-file.path(data_clean,archivo_datos_unemp)
 
 ######CARGA DATOS######
-
 
 inflation <- read.csv(path_inflation,
                       skip = 4,
@@ -44,7 +44,7 @@ unemp <- read.csv(path_unemp,
                   header=TRUE)
 
 
-###LIMPIEZA DATOS#####
+########LIMPIEZA DATOS#########
 
 ######INFLATION########
 
@@ -92,7 +92,7 @@ gdp_largos <- gdp_largos %>%
   select('Country.Name','anio','gdp')
 
 
-#######unemployment##########
+#######UNEMPLOYMENT##########
 
 #Estructura de los datos
 glimpse(unemp)
@@ -116,7 +116,7 @@ unemp_largos <- unemp_largos %>%
   select('Country.Name','anio','unemp')
 
 
-####joinear todo en un unico dataset########
+####Joinear todo en un unico dataset########
 
 data <- inflation_largos %>% 
   left_join(gdp_largos, by = c("Country.Name", "anio")) %>%
@@ -178,7 +178,12 @@ regiones_a_excluir <- c(
   "Upper middle income",
   "World"
 )
+
+#filtar datos de no paises y se filtran datos para tres años
 data_paises <- data %>%
   filter(!pais %in% regiones_a_excluir)%>%
   filter(anio %in% c(2000,2010,2020))
 
+#Se guardan datos en un nuevo file
+path_data_paises<-file.path(data_row,"data_paises.csv")
+write.csv(data_paises,path_data_paises,row.names = FALSE)

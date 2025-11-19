@@ -1,8 +1,4 @@
 # 1. Definir las estadísticas a calcular
-
-path_data_paises<-file.path(data_row,"data_paises.csv")
-data_paises_estadistica<-read.csv(path_data_paises)
-
 calcular_estadisticas <- list(
   media = ~mean(., na.rm = TRUE),
   mediana = ~median(., na.rm = TRUE),
@@ -14,7 +10,7 @@ calcular_estadisticas <- list(
 )
 
 # 2. Generar el resumen agrupado en formato ANCHO
-resumen_descriptivo_ancho <- data_paises_estadistica %>%
+resumen_descriptivo_ancho <- data_paises %>%
   select(where(is.numeric),-anio,) %>%
   summarise(
     across(
@@ -30,11 +26,6 @@ resumen_descriptivo_largo<-resumen_descriptivo_ancho %>%
   pivot_longer(cols = everything(),
                names_to = "variable",
                values_to = "valor")
-
-resumen_descriptivo_ancho_2<-resumen_descriptivo_largo%>%
-  pivot_wider(names_from = "variable",
-              names_ = "_",
-              values_from = "valor")
 
 # 3. Mostrar el resultado final
 print("📊 Resumen Descriptivo en formato largo")
