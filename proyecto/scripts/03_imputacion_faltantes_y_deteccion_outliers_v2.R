@@ -3,15 +3,18 @@ library(patchwork)
 library(kableExtra)
 library(mice)
 
+path_data_paises<-file.path(data_row,"data_paises.csv")
+data_paises_faltantes<-read.csv(path_data_paises)
+
 #Calcular estadísticas de faltantes
 
-resumen_faltantes <- data_paises %>%
+resumen_faltantes <- data_paises_faltantes %>%
   miss_var_summary() %>%
   filter(n_miss > 0)
 
 # Gráfico de barras de porcentaje faltante
 
-p1 <- gg_miss_var(data_paises, show_pct = TRUE) +
+p1 <- gg_miss_var(data_paises_faltantes, show_pct = TRUE) +
   labs(title = "Porcentaje de valores faltantes por variable",
        y = "Variables") +
   theme(axis.text.y = element_text(size = 10))
@@ -20,7 +23,7 @@ p1
 
 
 # Patrón de datos faltantes (heatmap)
-p2 <- vis_miss(data_paises %>% 
+p2 <- vis_miss(data_paises_faltantes %>% 
                 select(inflacion, unemp, gdp),
                cluster = TRUE) +
   labs(title = "Patrón de datos faltantes",
@@ -33,7 +36,7 @@ p1 / p2
 ####Test MCAR
 
 # Preparar datos para el test
-datos_para_test <- data_paises %>%
+datos_para_test <- data_paises_faltantes %>%
   select(where(is.numeric)) %>%
   select(where(~any(is.na(.))))
 
@@ -57,33 +60,27 @@ resultados_mcar %>%
 
 ##### Imputación múltiple############
 
+vars_mice <- data_paises_faltantes %>%
+  select(gdp,inflacion,unemp)
+
+mice_imp <- mice(vars_mice,
+                 m = 5,            # 5 imputaciones
+                 method = 'pmm',   # Predictive mean matching
+                 seed = 2025,
+                 printFlag = FALSE)
+
+# Ver métodos utilizados
+print(mice_imp$method)
+
+data_paises_imp<-complete(mice_imp,1)
+
 # 1. Asegurar que las variables clave tengan el formato correcto
 
-data_imputar <- data_paises %>%
+data_imputar <- data_paises_faltantes %>%
   mutate(pais = as.factor(pais))
 
 # 2. Verificar la estructura de las variables
 str(data_imputar)
-# 2. Configurar la imputación MICE
-
-#####################################################################
-#PREPARACIÓN Y CONFIGURACIÓN MICE PARA DATOS DE PANEL
-#####################################################################
-
-# 1. Asegurar que la variable de cluster es un FACTOR y luego convertirla a INTEGER
-data_imputar <- data_paises %>%
-  mutate(
-    # Primero aseguramos que es un factor (necesario para mantener el orden)
-    pais_Factor = as.factor(pais),
-    # Luego convertimos el factor a un entero.
-    # Cada nivel del factor (cada país) recibirá un identificador numérico único (1, 2, 3, ...)
-    pais_ID = as.integer(pais_Factor)
-  ) %>%
-  # Quitamos la columna original del nombre si data_paises la tenía y no la vamos a imputar
-  select(-pais_Factor) # Mantenemos solo el ID para MICE
-
-
-# 2. Configurar la imputación MICE
 
 # Variables con NAs a imputar
 variables_a_imputar <- c("inflacion", "gdp", "unemp")
@@ -124,7 +121,7 @@ mice_imp_panel <- mice(
 
 # 1. Preparar datos para comparación, añadiendo una columna de origen
 comparacion_dist <- bind_rows(
-  data_paises %>%
+  data_paises_faltantes %>%
     select(inflacion, gdp, unemp) %>%
     mutate(Origen = "Original"),
   datos_imp_mice %>%
@@ -159,7 +156,7 @@ datos_imputados_parciales <- complete(mice_imp, 1)
 
 # 2. Identificar las variables faltantes en la tabla imputada
 #    (Reemplaza 'pais' y 'anio' con los nombres reales de tus variables)
-variables_faltantes <- data_paises %>%
+variables_faltantes <- data_paises_faltantes %>%
   select(pais, anio)
 
 # 3. Combinar las variables faltantes con el resultado de la imputación
