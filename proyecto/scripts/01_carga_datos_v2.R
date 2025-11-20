@@ -11,8 +11,8 @@ rm(list = ls())
 options(stringsAsFactors = FALSE)
 options(scipen = 999)  
 
-#Seter directorio de trabajo
-setwd(r'(C:\Users\d185436\Documents\GitHub\ciencia_de_datos_TP_final\proyecto)')
+#Setear directorio de trabajo
+setwd(r'(E:\Diego\Mis Documentos\GitHub\ciencia_de_datos_TP_final\proyecto)')
 
 data_clean<-file.path(r'(data/clean)')
 data_row<-file.path(r'(data/row)')
@@ -59,10 +59,11 @@ colnames(inflation) <- gsub("^X", "", colnames(inflation))
 
 #pivotear
 
-inflation_largos  <- inflation %>% pivot_longer(cols= 5:69 ,
-                                                names_to = "anio",               # Nombre de la nueva columna
-                                                values_to = "inflacion",        # Nombre de la columna de valores
-                                                names_transform = list(anio = as.numeric)  # Convertir años a numérico
+inflation_largos  <- inflation %>% 
+  pivot_longer(cols= 5:69,
+               names_to = "anio",               # Nombre de la nueva columna
+               values_to = "inflacion",        # Nombre de la columna de valores
+               names_transform = list(anio = as.numeric)  # Convertir años a numérico
 )
 #seleccionar variables 
 inflation_largos <- inflation_largos %>% 
