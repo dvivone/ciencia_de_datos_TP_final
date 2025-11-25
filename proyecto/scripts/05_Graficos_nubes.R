@@ -1,0 +1,114 @@
+#setwd(r'(C:\Users\andre\Documents\cienciadatos\tp_final\data\raw)')
+path_data_paises<-file.path(data_row,"data_paises_completos.csv")
+data_paises_completos<-read.csv(path_data_paises)
+
+
+#######filtro años######### 
+
+#data_paises_filtr <- data_paises_completos %>%
+#filter(anio %in% c(1993, 1994, 2006, 2007, 2018, 2019))
+
+######creacion variable tasa de desempleo
+
+data_paises_filtr <- data_paises_completos %>%
+  group_by(pais) %>%
+  arrange(pais,anio) %>%
+    mutate(
+    tasa_unemp = (unemp - lag(unemp)) / lag(unemp) * 100
+  ) %>%
+  ungroup()
+
+####filtro
+data_paises_filtr <- data_paises_filtr %>% 
+  filter(anio%in%c(1994,2007,2019))%>%
+  filter(is_outlier_iqr==0)
+
+# 4. DETECCIÓN DE OUTLIERS ####
+
+#cat("\n\n=== 4. DETECCIÓN DE OUTLIERS ===\n")
+
+# A) Método IQR (Rango Intercuartílico)
+#Q1 <- quantile(data_paises_filtr$inflacion, 0.25, na.rm = TRUE)
+#Q3 <- quantile(data_paises_filtr$inflacion, 0.75, na.rm = TRUE)
+#IQR_val <- Q3 - Q1
+
+#limite_inferior <- Q1 - 1.5 * IQR_val
+#limite_superior <- Q3 + 1.5 * IQR_val
+
+#data_paises_filtr <-  data_paises_filtr %>% 
+#  mutate(
+#   outlier_iqr = !is.na(inflacion) &
+#     (inflacion < limite_inferior | inflacion > limite_superior)
+#  ) %>% filter(outlier_iqr==FALSE)
+
+#####################1994##############
+
+datos_1994 <- data_paises_filtr %>%
+  filter(anio==1994)
+
+##nube de puntos 
+
+ggplot(datos_1994, aes(x = tasa_unemp, y = inflacion)) +
+  # Añade los puntos (nube de puntos)
+  geom_point(alpha = 0.6, color = "darkblue") +
+  
+  # Añade la línea de regresión lineal (geom_smooth con method="lm")
+  # El área gris alrededor es el intervalo de confianza (SE)
+  geom_smooth(method = "lm", color = "red", se = TRUE) +
+  
+  # Añade títulos y etiquetas para mejor claridad
+  labs(
+    title = "Relación entre Desempleo (unemp) e Inflación",
+    x = "Tasa de Desempleo (unemp)",
+    y = "Tasa de Inflación (inflacion)"
+  ) +
+  
+  # Un tema limpio para mejor visualización
+  theme_minimal()
+
+##################2007#################
+datos_2007 <- data_paises_filtr %>% filter(anio==2007)
+
+##nube de puntos 
+
+ggplot(datos_2007, aes(x = tasa_unemp, y = inflacion)) +
+  # Añade los puntos (nube de puntos)
+  geom_point(alpha = 0.6, color = "darkblue") +
+  
+  # Añade la línea de regresión lineal (geom_smooth con method="lm")
+  # El área gris alrededor es el intervalo de confianza (SE)
+  geom_smooth(method = "lm", color = "red", se = TRUE) +
+  
+  # Añade títulos y etiquetas para mejor claridad
+  labs(
+    title = "Relación entre Desempleo (unemp) e Inflación",
+    x = "Tasa de Desempleo (unemp)",
+    y = "Tasa de Inflación (inflacion)"
+  ) +
+  
+  # Un tema limpio para mejor visualización
+  theme_minimal()
+
+#################2019##########################
+
+datos_2019 <- data_paises_filtr %>% filter(anio==2019)
+
+##nube de puntos 
+
+ggplot(datos_2019, aes(x = tasa_unemp, y = inflacion)) +
+  # Añade los puntos (nube de puntos)
+  geom_point(alpha = 0.6, color = "darkblue") +
+  
+  # Añade la línea de regresión lineal (geom_smooth con method="lm")
+  # El área gris alrededor es el intervalo de confianza (SE)
+  geom_smooth(method = "lm", color = "red", se = TRUE) +
+  
+  # Añade títulos y etiquetas para mejor claridad
+  labs(
+    title = "Relación entre Desempleo (unemp) e Inflación",
+    x = "Tasa de Desempleo (unemp)",
+    y = "Tasa de Inflación (inflacion)"
+  ) +
+  
+  # Un tema limpio para mejor visualización
+  theme_minimal()
