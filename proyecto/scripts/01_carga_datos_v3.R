@@ -188,3 +188,39 @@ data_paises <- data %>%
 #Se guardan datos en un nuevo file
 path_data_paises<-file.path(data_row,"data_paises.csv")
 write.csv(data_paises,path_data_paises,row.names = FALSE)
+
+############estructura del data frame
+
+resumen_estructura <- data.frame(
+  "Variable" = colnames(data_paises), # Nombres de las columnas
+  "Tipo_Dato" = sapply(data_paises, class)  # Tipo de dato de cada columna
+)
+
+# 3. GENERAR LA TABLA KABLE CON EL RESUMEN
+resumen_columnas <- data.frame(
+  "Variable" = colnames(data_paises),
+  "Tipo_Dato" = sapply(data_paises, class)
+)
+
+# 3. AÑADIR LA INFORMACIÓN DE LAS DIMENSIONES COMO UNA FILA EXTRA
+# Calculamos las dimensiones
+num_filas <- nrow(data_paises)
+num_columnas <- ncol(data_paises)
+
+# Creamos la cadena de texto para la fila de resumen
+info_dimensiones <- paste(num_filas, "Filas (Observaciones) x", num_columnas, "Columnas (Variables)")
+
+# Añadimos la nueva fila al resumen
+resumen_completo <- resumen_columnas %>%
+  tibble::add_row(Variable = "DIMENSIONES TOTALES", Tipo_Dato = info_dimensiones)
+
+# 4. GENERAR LA TABLA KABLE FINAL
+tabla_final_completa <- resumen_completo %>%
+  kable(
+    caption = "Análisis Estructural Completo de data_paises",
+    col.names = c("Variable", "Tipo de Dato"),
+    align = c('l', 'l')
+  )
+
+# 5. MOSTRAR LA TABLA KABLE
+print(tabla_final_completa)
