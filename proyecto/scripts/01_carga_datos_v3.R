@@ -183,7 +183,7 @@ regiones_a_excluir <- c(
 #filtar datos de no paises y se filtran datos para tres años
 data_paises <- data %>%
   filter(!pais %in% regiones_a_excluir)%>%
-  filter(anio %in% c(2010,2017,2023))
+  filter(anio %in% c(1993, 1994, 2006, 2007, 2018, 2019))
 
 #Se guardan datos en un nuevo file
 path_data_paises<-file.path(data_row,"data_paises.csv")
