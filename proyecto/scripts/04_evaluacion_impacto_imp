@@ -1,1 +1,127 @@
+#########Evaluación impacto imputación 
 
+library(tidyverse)
+library(kableExtra)
+
+#Rutas
+#setear wd setwd(r'(C:\Users\andre\Documents\cienciadatos\tp_final)')
+
+
+instub <- 'data/input'
+outstub <- 'data/input'
+
+data_instub<-file.path(instub)
+
+#Importar datos
+
+data_paises <- read.csv(file.path(data_instub,"data_paises.csv"))
+data_paises_imp <- read.csv(file.path(data_instub,"data_paises_imp.csv"))
+
+
+###Comparacion 
+
+# --- 1. Función para calcular las estadísticas ---
+calcular_estadisticas <- function(df, nombre_df) {
+  df %>%
+    summarise(across(c(inflacion, gdp, unemp),
+                     .fns = list(
+                       N = ~sum(!is.na(.)),
+                       Media = ~mean(., na.rm = TRUE),
+                       Mediana = ~median(., na.rm = TRUE),
+                       DesvStd = ~sd(., na.rm = TRUE)
+                     ),
+                     .names = "{.col}_{.fn}")) %>%
+    # Pivotear para tener las variables en filas
+    pivot_longer(everything(), names_to = "Estadistico", values_to = "Valor") %>%
+    separate(Estadistico, into = c("Variable", "Medida"), sep = "_") %>%
+    pivot_wider(names_from = Medida, values_from = Valor) %>%
+    mutate(Data_Frame = nombre_df) %>%
+    # Reordenar columnas para mejor lectura
+    select(Data_Frame, Variable, N, Media, Mediana, DesvStd)
+}
+
+# --- 2. Aplicar la función a ambos data frames ---
+stats_paises <- calcular_estadisticas(data_paises, "data_paises")
+stats_paises_imp <- calcular_estadisticas(data_paises_imp, "data_paises_imp")
+
+# --- 3. Combinar los resultados en una sola tabla de comparación ---
+tabla_comparativa <- bind_rows(stats_paises, stats_paises_imp) %>%
+  pivot_wider(names_from = Data_Frame,
+              values_from = c(N, Media, Mediana, DesvStd),
+              names_sep = "_")
+
+# --- 4. Cuantificar la alteración (Cambio Porcentual Relativo en la Media) ---
+# Usamos la Media como indicador principal de alteración para simplificar
+tabla_alteracion <- tabla_comparativa %>%
+  mutate(
+    # Calcular el cambio absoluto
+    Diferencia_Media_Abs = Media_data_paises_imp - Media_data_paises,
+    # Calcular el porcentaje de cambio relativo (Nivel de alteración)
+    Alteracion_Media_Porcentual = (Diferencia_Media_Abs / Media_data_paises) * 100,
+    
+    Diferencia_DesvStd_Abs = DesvStd_data_paises_imp - DesvStd_data_paises,
+    Alteracion_DesvStd_Porcentual = (Diferencia_DesvStd_Abs / DesvStd_data_paises) * 100
+  ) %>%
+  # Seleccionar y reordenar las columnas finales
+  select(
+    Variable,
+    # data_paises (Original)
+    N_data_paises,
+    Media_data_paises,
+    Mediana_data_paises,
+    DesvStd_data_paises,
+    # data_paises_imp (Imputado)
+    N_data_paises_imp,
+    Media_data_paises_imp,
+    Mediana_data_paises_imp,
+    DesvStd_data_paises_imp,
+    # Alteraciones
+    Alteracion_Media_Porcentual,
+    Alteracion_DesvStd_Porcentual
+  )%>%
+  # Seleccionar y reordenar las columnas finales
+  select(
+    Variable,
+    N_data_paises,
+    Media_data_paises,
+    Mediana_data_paises,
+    DesvStd_data_paises,
+    N_data_paises_imp,
+    Media_data_paises_imp,
+    Mediana_data_paises_imp,
+    DesvStd_data_paises_imp,
+    Alteracion_Media_Porcentual,
+    Alteracion_DesvStd_Porcentual
+  )
+
+
+
+########kablee
+tabla_alteracion %>%
+  # Formatear números a 2 decimales
+  mutate(across(starts_with(c("Media", "Mediana", "DesvStd")), ~ round(., 2))) %>%
+  # Formatear las columnas de Alteración como porcentaje
+  mutate(Alteracion_Media_Porcentual = paste0(round(Alteracion_Media_Porcentual, 2), " %"),
+         Alteracion_DesvStd_Porcentual = paste0(round(Alteracion_DesvStd_Porcentual, 2), " %")) %>%
+  
+  kbl(
+    caption = "Comparación de Estadísticas y Nivel de Alteración por Imputación",
+    col.names = c(
+      "Variable",
+      # data_paises
+      "N", "Media", "Mediana", "Desv. Std",
+      # data_paises_imp
+      "N", "Media", "Mediana", "Desv. Std",
+      # Alteración
+      "Media (%)", "Desv. Std (%)"
+    ),
+    align = c("l", rep("c", 10))
+  ) %>%
+  kable_classic_2(full_width = F) %>%
+  # Agrupar las cabeceras
+  add_header_above(c(" " = 1,
+                     "datos sin imputar" = 4,
+                     "datos imputados" = 4,
+                     "Alteración Producida" = 2)) %>%
+  # Resaltar las columnas de alteración
+  column_spec(10:11, bold = T, color = "red")
