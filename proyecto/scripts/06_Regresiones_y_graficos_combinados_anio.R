@@ -1,92 +1,63 @@
+library(car)
+
 # ============================================================
-# GRAFICOS Y REGRESIONES PARA 1994, 2007 y 2019
+# GRAFICOS Y REGRESIONES PARA 2011, 2016 y 2022
 # ============================================================
 
 path_data_paises<-file.path(data_row,"data_paises_completos.csv")
 data_paises_completos<-read.csv(path_data_paises)
 
-#Filtro paises
+glimpse(data_paises_completos)
 
-data_graficos <- data_paises_completos %>%
-  filter(!pais %in% regiones_a_excluir) %>%  
-  filter(anio %in% c(1993, 1994, 2006, 2007, 2018, 2019)) %>%  
-  group_by(pais) %>%
-  arrange(pais, anio) %>%
-  mutate(
-    tasa_unemp = (unemp - lag(unemp)) / lag(unemp) * 100
-  ) %>%
-  ungroup() %>%
-  filter(anio %in% c(1994, 2007, 2019))
+variables_numericas<-data_paises_completos%>%
+  select(gdp,inflacion,unemp)
 
-# ------------------------------------------------------------
-# Eliminamos outliers de inflación (método IQR) para los gráficos y regresiones
-# ------------------------------------------------------------
-Q1 <- quantile(data_graficos$inflacion, 0.25, na.rm = TRUE)
-Q3 <- quantile(data_graficos$inflacion, 0.75, na.rm = TRUE)
-IQR_val <- Q3 - Q1
-
-limite_inferior <- Q1 - 1.5 * IQR_val
-limite_superior <- Q3 + 1.5 * IQR_val
-
-data_graficos <- data_graficos %>%
-  filter(!is.na(inflacion)) %>%
-  mutate(
-    outlier_iqr = inflacion < limite_inferior | inflacion > limite_superior
-  ) %>%
-  filter(outlier_iqr == FALSE)
-
+cor(variables_numericas)
 
 # Separar datasets por año
-datos_1994 <- data_graficos %>% filter(anio == 1994)
-datos_2007 <- data_graficos %>% filter(anio == 2007)
-datos_2019 <- data_graficos %>% filter(anio == 2019)
+datos_2011 <- data_paises_completos %>% 
+  filter(anio == 2011)
+datos_2016 <- data_paises_completos %>% 
+  filter(anio == 2016)
+datos_2022 <- data_paises_completos %>% 
+  filter(anio == 2022)
 
-nrow(datos_1994); nrow(datos_2007); nrow(datos_2019)
+nrow(datos_2011); nrow(datos_2016); nrow(datos_2022)
+
+wilcox.test(datos_2016$inflacion,datos_2022$inflacion,paired=TRUE)
 
 # --------REGRESIONES: inflación ~ variación del desempleo + gdp-------
 
-# Nos quedamos con observaciones completas
-base_reg <- data_graficos %>%
-  filter(
-    !is.na(tasa_unemp),
-    !is.na(inflacion),
-    !is.na(gdp)
-  )
-
-# Separar por año para las regresiones
-datos_1994_reg <- base_reg %>% filter(anio == 1994)
-datos_2007_reg <- base_reg %>% filter(anio == 2007)
-datos_2019_reg <- base_reg %>% filter(anio == 2019)
-
-nrow(datos_1994_reg); nrow(datos_2007_reg); nrow(datos_2019_reg)
-
-# Modelo 1994
-modelo_1994 <- lm(inflacion ~ tasa_unemp + gdp, data = datos_1994_reg)
-summary(modelo_1994)
+# Modelo 2011
+modelo_2011 <- lm(inflacion ~ unemp + gdp, data = datos_2011)
+summary(modelo_2011)
 
 # Modelo 2007
-modelo_2007 <- lm(inflacion ~ tasa_unemp + gdp, data = datos_2007_reg)
-summary(modelo_2007)
+modelo_2016 <- lm(inflacion ~ unemp + gdp, data = datos_2016)
+summary(modelo_2016)
 
-# Modelo 2019
-modelo_2019 <- lm(inflacion ~ tasa_unemp + gdp, data = datos_2019_reg)
-summary(modelo_2019)
+# Modelo 2022
+modelo_2022 <- lm(inflacion ~ unemp + gdp, data = datos_2022)
+summary(modelo_2022)
 
+vif(modelo_2011)
+bptest(modelo_2011)
+plot(modelo_2011)
 
 # ------------------------------------------------------------
-# GRAFICOS COMBINADOS POR AÑO (1994, 2007, 2019)
+# GRAFICOS COMBINADOS POR AÑO (2011, 2007, 2022)
 # Inflación vs variación del desempleo  +  Inflación vs crecimiento del PBI
 # ============================================================
 
 # Usamos la misma base_reg que ya armamos para las regresiones
 # (ya tiene fuera de outliers y sin NA en tasa_unemp, inflacion, gdp)
 
-# ---------- 1994 ----------
-p1994_unemp <- ggplot(datos_1994_reg, aes(x = tasa_unemp, y = inflacion)) +
+# ---------- 2011 ----------
+p2011_unemp <- ggplot(datos_2011, aes(x = unemp, y = inflacion)) +
   geom_point(alpha = 0.8, size = 2.5, color = "darkblue") +
   geom_smooth(method = "lm", color = "red", se = TRUE) +
   labs(
-    title = "Inflación vs variación del desempleo (1994)",
+    title = "Inflación vs variación del desempleo (2011)",
     x = "Variación del desempleo (%)",
     y = "Inflación (%)"
   ) +
@@ -97,11 +68,11 @@ p1994_unemp <- ggplot(datos_1994_reg, aes(x = tasa_unemp, y = inflacion)) +
     axis.text  = element_text(size = 11)
   )
 
-p1994_gdp <- ggplot(datos_1994_reg, aes(x = gdp, y = inflacion)) +
+p2011_gdp <- ggplot(datos_2011, aes(x = gdp, y = inflacion)) +
   geom_point(alpha = 0.8, size = 2.5, color = "darkgreen") +
   geom_smooth(method = "lm", color = "orange", se = TRUE) +
   labs(
-    title = "Inflación vs crecimiento del PBI (1994)",
+    title = "Inflación vs crecimiento del PBI (2011)",
     x = "Crecimiento del PBI (%)",
     y = "Inflación (%)"
   ) +
@@ -112,16 +83,16 @@ p1994_gdp <- ggplot(datos_1994_reg, aes(x = gdp, y = inflacion)) +
     axis.text  = element_text(size = 11)
   )
 
-# Ventana con los dos gráficos de 1994 apilados
-p1994_unemp / p1994_gdp
+# Ventana con los dos gráficos de 2011 apilados
+p2011_unemp / p2011_gdp
 
 
-# ---------- 2007 ----------
-p2007_unemp <- ggplot(datos_2007_reg, aes(x = tasa_unemp, y = inflacion)) +
+# ---------- 2016 ----------
+p2016_unemp <- ggplot(datos_2016, aes(x = unemp, y = inflacion)) +
   geom_point(alpha = 0.8, size = 2.5, color = "darkblue") +
   geom_smooth(method = "lm", color = "red", se = TRUE) +
   labs(
-    title = "Inflación vs variación del desempleo (2007)",
+    title = "Inflación vs variación del desempleo (2016)",
     x = "Variación del desempleo (%)",
     y = "Inflación (%)"
   ) +
@@ -132,11 +103,11 @@ p2007_unemp <- ggplot(datos_2007_reg, aes(x = tasa_unemp, y = inflacion)) +
     axis.text  = element_text(size = 11)
   )
 
-p2007_gdp <- ggplot(datos_2007_reg, aes(x = gdp, y = inflacion)) +
+p2016_gdp <- ggplot(datos_2016, aes(x = gdp, y = inflacion)) +
   geom_point(alpha = 0.8, size = 2.5, color = "darkgreen") +
   geom_smooth(method = "lm", color = "orange", se = TRUE) +
   labs(
-    title = "Inflación vs crecimiento del PBI (2007)",
+    title = "Inflación vs crecimiento del PBI (2016)",
     x = "Crecimiento del PBI (%)",
     y = "Inflación (%)"
   ) +
@@ -147,15 +118,15 @@ p2007_gdp <- ggplot(datos_2007_reg, aes(x = gdp, y = inflacion)) +
     axis.text  = element_text(size = 11)
   )
 
-p2007_unemp / p2007_gdp
+p2016_unemp / p2016_gdp
 
 
-# ---------- 2019 ----------
-p2019_unemp <- ggplot(datos_2019_reg, aes(x = tasa_unemp, y = inflacion)) +
+# ---------- 2022 ----------
+p2022_unemp <- ggplot(datos_2022, aes(x = unemp, y = inflacion)) +
   geom_point(alpha = 0.8, size = 2.5, color = "darkblue") +
   geom_smooth(method = "lm", color = "red", se = TRUE) +
   labs(
-    title = "Inflación vs variación del desempleo (2019)",
+    title = "Inflación vs variación del desempleo (2022)",
     x = "Variación del desempleo (%)",
     y = "Inflación (%)"
   ) +
@@ -166,11 +137,11 @@ p2019_unemp <- ggplot(datos_2019_reg, aes(x = tasa_unemp, y = inflacion)) +
     axis.text  = element_text(size = 11)
   )
 
-p2019_gdp <- ggplot(datos_2019_reg, aes(x = gdp, y = inflacion)) +
+p2022_gdp <- ggplot(datos_2022, aes(x = gdp, y = inflacion)) +
   geom_point(alpha = 0.8, size = 2.5, color = "darkgreen") +
   geom_smooth(method = "lm", color = "orange", se = TRUE) +
   labs(
-    title = "Inflación vs crecimiento del PBI (2019)",
+    title = "Inflación vs crecimiento del PBI (2022)",
     x = "Crecimiento del PBI (%)",
     y = "Inflación (%)"
   ) +
@@ -181,7 +152,7 @@ p2019_gdp <- ggplot(datos_2019_reg, aes(x = gdp, y = inflacion)) +
     axis.text  = element_text(size = 11)
   )
 
-p2019_unemp / p2019_gdp
+p2022_unemp / p2022_gdp
 
 
 
