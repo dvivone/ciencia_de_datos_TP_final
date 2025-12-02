@@ -13,7 +13,7 @@ options(stringsAsFactors = FALSE)
 options(scipen = 999)  
 
 #Setear directorio de trabajo
-setwd(r'(E:\Diego\Mis Documentos\GitHub\ciencia_de_datos_TP_final\proyecto)')
+setwd(r'(C:\users\d185436\my documents\GitHub\ciencia_de_datos_TP_final\proyecto)')
 
 data_clean<-file.path(r'(data/clean)')
 data_row<-file.path(r'(data/row)')
