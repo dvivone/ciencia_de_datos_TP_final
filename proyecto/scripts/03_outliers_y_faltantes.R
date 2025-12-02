@@ -1,6 +1,5 @@
 #Imputación faltantes y detección de outliers
 
-
 #Librerías
 
 library(naniar)
@@ -8,17 +7,10 @@ library(patchwork)
 library(kableExtra)
 library(mice)
 
-#Rutas
-
-auxiliar <- 'auxiliar'
-instub <- 'data/input'
-outstub <- 'data/input'
-
 #carga datos
 
-data_paises <- read.csv(file.path(instub,"data_paises.csv"))
-
-
+path_data_paises<-file.path(data_row,"data_paises.csv")
+data_paises_estadistica<-read.csv(path_data_paises)
 
 ###DETECCION DE OUTLIERS METODO IQR
 
@@ -134,5 +126,5 @@ data_paises_completo <- data_paises_imp1 %>%
 ########Guardamos los datos con los valores imputados
 
 write.csv(data_paises_completo,
-          file.path(outstub, "data_paises_imp.csv"),
+          file.path(data_row, "data_paises_completos.csv"),
           row.names = FALSE)

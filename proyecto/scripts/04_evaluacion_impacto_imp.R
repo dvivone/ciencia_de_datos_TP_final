@@ -3,20 +3,8 @@
 library(tidyverse)
 library(kableExtra)
 
-#Rutas
-#setear wd setwd(r'(C:\Users\andre\Documents\cienciadatos\tp_final)')
-
-
-instub <- 'data/input'
-outstub <- 'data/input'
-
-data_instub<-file.path(instub)
-
-#Importar datos
-
-data_paises <- read.csv(file.path(data_instub,"data_paises.csv"))
-data_paises_imp <- read.csv(file.path(data_instub,"data_paises_imp.csv"))
-
+data_paises <- read.csv(file.path(data_row,"data_paises.csv"))
+data_paises_imp <- read.csv(file.path(data_row,"data_paises_completos.csv"))
 
 ###Comparacion 
 

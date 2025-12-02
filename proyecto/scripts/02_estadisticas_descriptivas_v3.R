@@ -28,37 +28,44 @@ estadisticas_paises_largo<- estadisticas_paises_largo%>%
 estadisticas_paises_largo
 
 shapiro.test(data_paises_estadistica$gdp)
-qqnorm(data_paises_estadistica$inflacion)
+qqnorm(data_paises_estadistica$gdp)
+qqline(data_paises_estadistica$gdp, col = "red", lwd = 2)
 
-# Histogramas por género
-ggplot(data_paises_estadistica, aes(x = gdp, fill = anio)) +
-  geom_histogram(bins = 50, alpha = 0.6, position = "identity") +
-  scale_x_continuous(labels = scales::comma, limits = c(0, 20)) +
-  labs(
-    title = "Distribución de ingresos por género - EPH 1T 2025",
-    x = "Ingreso de la ocupación principal",
-    y = "Frecuencia",
-    fill = "Género"
-  ) +
-  theme_minimal() +
-  facet_wrap(~anio, ncol = 1)
+# Histogramas por variable
 
-# Boxplots comparativos
-ggplot(data_paises_estadistica, aes(x = anio, y=gdp, fill = gdp)) +
-  geom_boxplot(alpha = 0.7, outlier.alpha = 0.3) +
-  stat_summary(fun = mean, geom = "point", 
-               shape = 23, size = 4, fill = "red") +
-  scale_y_continuous(labels = scales::comma, limits = c(0, 15)) +
+histo_infla<-ggplot(data_paises_estadistica, aes(x = inflacion, fill = anio)) +
+  geom_histogram(bins = 30, alpha = 0.6,fill="#feb686", color="#e9ecef") +
+  scale_x_continuous(labels = percent_format(scale=1), limits = c(0, 30)) +
+  scale_y_continuous(limits = c(0,100))+
   labs(
-    title = "Comparación de ingresos por género",
-    subtitle = "Rombo rojo = media | Línea horizontal = mediana",
-    y = "Ingreso",
-    x = "Género"
+    title = "Distribucion",
+    x = "Inflacion",
+    y = "Frecuencia"
   ) +
-  theme_minimal() +
-  theme(legend.position = "none")+
-  facet_wrap(~anio, ncol = 1)
-  
+  theme_minimal()
+
+histo_gdp<-ggplot(data_paises_estadistica, aes(x = gdp, fill = anio)) +
+  geom_histogram(bins = 30, alpha = 0.6,fill="#69b3a2", color="#e9ecef") +
+  scale_x_continuous(labels = percent_format(scale=1), limits = c(0, 30)) +
+  scale_y_continuous(limits = c(0,100))+
+  ylab(NULL)+
+  labs(
+      x = "gdp"
+  ) +
+  theme_minimal()
+
+histo_unemp<-ggplot(data_paises_estadistica, aes(x = unemp, fill = anio)) +
+  geom_histogram(bins = 30, alpha = 0.6,fill="#cda0c9", color="#e9ecef") +
+  scale_x_continuous(labels = percent_format(scale=1), limits = c(0, 30)) +
+  scale_y_continuous(limits = c(0,100))+
+  ylab(NULL)+
+  labs(
+      x = "unemp"
+  ) +
+  theme_minimal()
+
+histo_infla | histo_gdp | histo_unemp
+
 #Se guardan datos en un nuevo file
 path_data_paises<-file.path(data_row,"data_estadisticas_paises.csv")
 write.csv(estadisticas_paises_largo,path_data_paises,row.names = FALSE)
