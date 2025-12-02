@@ -240,3 +240,37 @@ tabla_final_completa <- resumen_completo %>%
   column_spec(2, italic = T)
 
 print(tabla_final_completa)
+
+#####################datos para la serie de tiempo ##############
+
+
+data_serie <- inflation_largos %>%
+  left_join(unemp_largos, by = c("pais", "anio"))
+
+serie_inflacion <- data_serie %>%
+  filter(!pais %in% regiones_a_excluir)
+
+
+
+
+# DATOS PARA PLOTEAR LA SERIE 
+
+df_promedios_globales <- serie_inflacion %>%
+  # 1. Agrupar el dataframe por la variable 'anio' (año)
+  group_by(anio) %>%
+  # 2. Calcular el promedio de 'unemp' e 'inflacion' para cada año
+  summarise(
+    promedio_unemp = mean(unemp, na.rm = TRUE),
+    promedio_inflacion = mean(inflacion, na.rm = TRUE)
+  ) %>%
+  # 3. Desagrupar para que el dataframe sea un dataframe normal
+  ungroup() %>% filter(anio >= 1998)
+
+# Mostrar el resultado (los primeros 6 años)
+head(df_promedios_globales)
+
+#Se guardan datos en un nuevo file
+path_data_serie<-file.path(outstub,"data_serie.csv")
+write.csv(df_promedios_globales,path_data_serie,row.names = FALSE)
+
+
