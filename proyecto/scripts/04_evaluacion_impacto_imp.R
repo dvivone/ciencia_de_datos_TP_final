@@ -11,7 +11,7 @@ data_paises_imp <- read.csv(file.path(data_row,"data_paises_completos.csv"))
 # --- 1. Función para calcular las estadísticas ---
 calcular_estadisticas <- function(df, nombre_df) {
   df %>%
-    summarise(across(c(inflacion, gdp, unemp),
+    summarise(across(c(inflacion, gdp, desempleo),
                      .fns = list(
                        N = ~sum(!is.na(.)),
                        Media = ~mean(., na.rm = TRUE),

@@ -1,3 +1,5 @@
+library(patchwork)
+
 # 1. Definir las estadísticas a calcular
 
 path_data_paises<-file.path(data_row,"data_paises.csv")
@@ -5,7 +7,7 @@ data_paises_estadistica<-read.csv(path_data_paises)
 
 #pivotear a lo largo
 data_paises_estadistica_largo<-data_paises_estadistica%>%
-  pivot_longer(cols = c(gdp,inflacion,unemp),
+  pivot_longer(cols = c(gdp,inflacion,desempleo),
                names_to = "variable")
 
 estadisticas_paises_largo<-data_paises_estadistica_largo%>%
@@ -27,10 +29,6 @@ estadisticas_paises_largo<- estadisticas_paises_largo%>%
   arrange(variable,anio)
 estadisticas_paises_largo
 
-shapiro.test(data_paises_estadistica$gdp)
-qqnorm(data_paises_estadistica$gdp)
-qqline(data_paises_estadistica$gdp, col = "red", lwd = 2)
-
 # Histogramas por variable
 
 histo_infla<-ggplot(data_paises_estadistica, aes(x = inflacion, fill = anio)) +
@@ -38,7 +36,7 @@ histo_infla<-ggplot(data_paises_estadistica, aes(x = inflacion, fill = anio)) +
   scale_x_continuous(labels = percent_format(scale=1), limits = c(0, 30)) +
   scale_y_continuous(limits = c(0,100))+
   labs(
-    title = "Distribucion",
+    title = "Distribucion de las variables",
     x = "Inflacion",
     y = "Frecuencia"
   ) +
@@ -54,17 +52,17 @@ histo_gdp<-ggplot(data_paises_estadistica, aes(x = gdp, fill = anio)) +
   ) +
   theme_minimal()
 
-histo_unemp<-ggplot(data_paises_estadistica, aes(x = unemp, fill = anio)) +
+histo_desempleo<-ggplot(data_paises_estadistica, aes(x = desempleo, fill = anio)) +
   geom_histogram(bins = 30, alpha = 0.6,fill="#cda0c9", color="#e9ecef") +
   scale_x_continuous(labels = percent_format(scale=1), limits = c(0, 30)) +
   scale_y_continuous(limits = c(0,100))+
   ylab(NULL)+
   labs(
-      x = "unemp"
+      x = "desempleo"
   ) +
   theme_minimal()
 
-histo_infla | histo_gdp | histo_unemp
+histo_infla | histo_gdp | histo_desempleo
 
 #Se guardan datos en un nuevo file
 path_data_paises<-file.path(data_row,"data_estadisticas_paises.csv")

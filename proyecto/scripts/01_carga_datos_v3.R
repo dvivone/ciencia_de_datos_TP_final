@@ -4,6 +4,7 @@ library(readxl)
 library(lubridate)
 library(scales)
 library(knitr)
+library(kableExtra)
 
 # Limpiar entorno
 rm(list = ls())
@@ -13,7 +14,7 @@ options(stringsAsFactors = FALSE)
 options(scipen = 999)  
 
 #Setear directorio de trabajo
-setwd(r'(C:\users\d185436\my documents\GitHub\ciencia_de_datos_TP_final\proyecto)')
+setwd(r'(E:\Diego\Mis documentos\GitHub\ciencia_de_datos_TP_final\proyecto)')
 
 data_clean<-file.path(r'(data/clean)')
 data_row<-file.path(r'(data/row)')
@@ -24,11 +25,11 @@ output_figures<-file.path(r'(output/figures)')
 
 archivo_datos_inflation<-"API_FP.CPI.TOTL.ZG_DS2_en_csv_v2_130173.csv"
 archivo_datos_gdp<-"API_NY.GDP.MKTP.KD.ZG_DS2_en_csv_v2_130026.csv"
-archivo_datos_unemp<-"API_SL.UEM.TOTL.ZS_DS2_en_csv_v2_130165.csv"
+archivo_datos_desempleo<-"API_SL.UEM.TOTL.ZS_DS2_en_csv_v2_130165.csv"
 
 path_inflation<-file.path(data_clean,archivo_datos_inflation)
 path_gdp<-file.path(data_clean,archivo_datos_gdp)
-path_unemp<-file.path(data_clean,archivo_datos_unemp)
+path_desempleo<-file.path(data_clean,archivo_datos_desempleo)
 
 ######CARGA DATOS######
 
@@ -40,7 +41,7 @@ gdp <- read.csv(path_gdp,
                 skip=4,
                 header=TRUE)
 
-unemp <- read.csv(path_unemp,
+desempleo <- read.csv(path_desempleo,
                   skip=4,
                   header=TRUE)
 
@@ -94,35 +95,35 @@ gdp_largos <- gdp_largos %>%
   select('Country.Name','anio','gdp')
 
 
-#######UNEMPLOYMENT##########
+#######desempleoLOYMENT##########
 
 #Estructura de los datos
-glimpse(unemp)
+glimpse(desempleo)
 
 #eliminar columnas vacías
-unemp <- unemp[, 1:69] 
+desempleo <- desempleo[, 1:69] 
 
 #cambiar nombres de columnas
-colnames(unemp) <- gsub("^X", "", colnames(unemp))
+colnames(desempleo) <- gsub("^X", "", colnames(desempleo))
 
 #pivotear
 
-unemp_largos  <- unemp %>% 
+desempleo_largos  <- desempleo %>% 
   pivot_longer(cols= 5:69,
                names_to = "anio",               # Nombre de la nueva columna
-               values_to = "unemp",        # Nombre de la columna de valores
+               values_to = "desempleo",        # Nombre de la columna de valores
                names_transform = list(anio = as.numeric)  # Convertir años a numérico
 )
 #seleccionar variables 
-unemp_largos <- unemp_largos %>% 
-  select('Country.Name','anio','unemp')
+desempleo_largos <- desempleo_largos %>% 
+  select('Country.Name','anio','desempleo')
 
 
 ####Joinear todo en un unico dataset########
 
 data <- inflation_largos %>% 
   left_join(gdp_largos, by = c("Country.Name", "anio")) %>%
-  left_join(unemp_largos, by = c("Country.Name", "anio"))%>%
+  left_join(desempleo_largos, by = c("Country.Name", "anio"))%>%
   rename("pais"="Country.Name")
 
 #Dimensiones del dataset - observaciones disponibles
@@ -245,7 +246,7 @@ print(tabla_final_completa)
 
 
 data_serie <- inflation_largos %>%
-  left_join(unemp_largos, by = c("pais", "anio"))
+  left_join(desempleo_largos, by = c("pais", "anio"))
 
 serie_inflacion <- data_serie %>%
   filter(!pais %in% regiones_a_excluir)
@@ -258,9 +259,9 @@ serie_inflacion <- data_serie %>%
 df_promedios_globales <- serie_inflacion %>%
   # 1. Agrupar el dataframe por la variable 'anio' (año)
   group_by(anio) %>%
-  # 2. Calcular el promedio de 'unemp' e 'inflacion' para cada año
+  # 2. Calcular el promedio de 'desempleo' e 'inflacion' para cada año
   summarise(
-    promedio_unemp = mean(unemp, na.rm = TRUE),
+    promedio_desempleo = mean(desempleo, na.rm = TRUE),
     promedio_inflacion = mean(inflacion, na.rm = TRUE)
   ) %>%
   # 3. Desagrupar para que el dataframe sea un dataframe normal
