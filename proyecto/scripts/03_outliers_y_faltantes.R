@@ -9,7 +9,7 @@ library(mice)
 
 #carga datos
 
-path_data_paises<-file.path(data_row,"data_paises.csv")
+path_data_paises<-file.path(data_clean,"data_paises.csv")
 data_paises_estadistica<-read.csv(path_data_paises)
 
 ###DETECCION DE OUTLIERS METODO IQR
@@ -128,5 +128,5 @@ data_paises_completo <- data_paises_imp1 %>%
 ########Guardamos los datos con los valores imputados
 
 write.csv(data_paises_completo,
-          file.path(data_row, "data_paises_completos.csv"),
+          file.path(data_processed, "data_paises_completos.csv"),
           row.names = FALSE)

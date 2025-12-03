@@ -10,7 +10,7 @@ library(cowplot)
 # CARGA DE DATOS
 # ============================================================
 
-path_data_paises<-file.path(data_row,"data_paises_completos.csv")
+path_data_paises<-file.path(data_processed,"data_paises_completos.csv")
 data_paises_completos<-read.csv(path_data_paises)
 
 # ============================================================
@@ -40,7 +40,7 @@ plot_1 <- ggplot(data_paises_bloxpot) +
   ylab(NULL)+
   xlab(NULL)+
   labs(title = "Inflacion, crecimiento del PBI y desempleo",
-       subtitle = "Comparacion de la inflacion, el crecimiento del PBI y el desempleo entre los años 2011, 2016 y 2022")+
+       subtitle = "Comparacion de inflacion, crecimiento de PBI y desempleo entre los años 2011, 2016 y 2022")+
  theme(
     panel.grid.major = element_blank(),  
     panel.grid.minor = element_blank(),

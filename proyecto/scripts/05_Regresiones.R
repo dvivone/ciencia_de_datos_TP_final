@@ -14,7 +14,7 @@ library(sandwich)
 # CARGA DE DATOS
 # ============================================================
 
-path_data_paises<-file.path(data_row,"data_paises_completos.csv")
+path_data_paises<-file.path(data_processed,"data_paises_completos.csv")
 data_paises_completos<-read.csv(path_data_paises)
 
 # ============================================================

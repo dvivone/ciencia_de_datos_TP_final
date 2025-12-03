@@ -3,8 +3,8 @@
 library(tidyverse)
 library(kableExtra)
 
-data_paises <- read.csv(file.path(data_row,"data_paises.csv"))
-data_paises_imp <- read.csv(file.path(data_row,"data_paises_completos.csv"))
+data_paises <- read.csv(file.path(data_clean,"data_paises.csv"))
+data_paises_imp <- read.csv(file.path(data_processed,"data_paises_completos.csv"))
 
 ###Comparacion 
 

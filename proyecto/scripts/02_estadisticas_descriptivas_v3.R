@@ -2,7 +2,7 @@ library(patchwork)
 
 # 1. Definir las estadísticas a calcular
 
-path_data_paises<-file.path(data_row,"data_paises.csv")
+path_data_paises<-file.path(data_clean,"data_paises.csv")
 data_paises_estadistica<-read.csv(path_data_paises)
 
 #pivotear a lo largo
@@ -65,5 +65,5 @@ histo_desempleo<-ggplot(data_paises_estadistica, aes(x = desempleo, fill = anio)
 histo_infla | histo_gdp | histo_desempleo
 
 #Se guardan datos en un nuevo file
-path_data_paises<-file.path(data_row,"data_estadisticas_paises.csv")
+path_data_paises<-file.path(data_processed,"data_estadisticas_paises.csv")
 write.csv(estadisticas_paises_largo,path_data_paises,row.names = FALSE)

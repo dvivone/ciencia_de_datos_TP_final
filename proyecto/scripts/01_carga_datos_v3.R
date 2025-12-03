@@ -14,12 +14,11 @@ options(stringsAsFactors = FALSE)
 options(scipen = 999)  
 
 #Setear directorio de trabajo
-setwd(r'(E:\Diego\Mis documentos\GitHub\ciencia_de_datos_TP_final\proyecto)')
+setwd('~/GitHub/ciencia_de_datos_TP_final/proyecto')
 
 data_clean<-file.path(r'(data/clean)')
-data_row<-file.path(r'(data/row)')
+data_raw<-file.path(r'(data/raw)')
 data_processed<-file.path(r'(data/processed)')
-
 output_tables<-file.path(r'(output/tables)')
 output_figures<-file.path(r'(output/figures)')
 
@@ -27,9 +26,9 @@ archivo_datos_inflacion<-"API_FP.CPI.TOTL.ZG_DS2_en_csv_v2_130173.csv"
 archivo_datos_gdp<-"API_NY.GDP.MKTP.KD.ZG_DS2_en_csv_v2_130026.csv"
 archivo_datos_desempleo<-"API_SL.UEM.TOTL.ZS_DS2_en_csv_v2_130165.csv"
 
-path_inflacion<-file.path(data_clean,archivo_datos_inflacion)
-path_gdp<-file.path(data_clean,archivo_datos_gdp)
-path_desempleo<-file.path(data_clean,archivo_datos_desempleo)
+path_inflacion<-file.path(data_raw,archivo_datos_inflacion)
+path_gdp<-file.path(data_raw,archivo_datos_gdp)
+path_desempleo<-file.path(data_raw,archivo_datos_desempleo)
 
 ######CARGA DATOS######
 
@@ -187,10 +186,6 @@ data_paises <- data %>%
   filter(!pais %in% regiones_a_excluir)%>%
   filter(anio %in% c(2011,2016,2022))
 
-#Se guardan datos en un nuevo file
-path_data_paises<-file.path(data_row,"data_paises.csv")
-write.csv(data_paises,path_data_paises,row.names = FALSE)
-
   ###########ESTRUCTURA DEL DATA FRAME########
 
 resumen_estructura <- data.frame(
@@ -227,7 +222,7 @@ tabla_final_completa <- resumen_completo %>%
   kbl(
     caption = "Análisis Estructural Completo de data_paises",
     
-    row.names = FALSE,
+    raw.names = FALSE,
     col.names = c("Variable", "Tipo de Dato"),
     align = c('l', 'l')
   ) %>%
@@ -242,17 +237,17 @@ tabla_final_completa <- resumen_completo %>%
 
 print(tabla_final_completa)
 
+#Se guardan datos en un nuevo file
+path_data_paises<-file.path(data_clean,"data_paises.csv")
+write.csv(data_paises,path_data_paises,row.names = FALSE)
+
 #####################datos para la serie de tiempo ##############
 
-
 data_serie <- inflacion_largos %>%
-  left_join(desempleo_largos, by = c("pais", "anio"))
+  left_join(desempleo_largos, by = c('Country.Name', "anio"))
 
 serie_inflacion <- data_serie %>%
-  filter(!pais %in% regiones_a_excluir)
-
-
-
+  filter(!'Country.Name' %in% regiones_a_excluir)
 
 # DATOS PARA PLOTEAR LA SERIE 
 
@@ -271,7 +266,7 @@ df_promedios_globales <- serie_inflacion %>%
 head(df_promedios_globales)
 
 #Se guardan datos en un nuevo file
-path_data_serie<-file.path(outstub,"data_serie.csv")
+path_data_serie<-file.path(data_clean,"data_serie.csv")
 write.csv(df_promedios_globales,path_data_serie,row.names = FALSE)
 
 
