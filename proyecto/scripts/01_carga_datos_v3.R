@@ -23,17 +23,17 @@ data_processed<-file.path(r'(data/processed)')
 output_tables<-file.path(r'(output/tables)')
 output_figures<-file.path(r'(output/figures)')
 
-archivo_datos_inflation<-"API_FP.CPI.TOTL.ZG_DS2_en_csv_v2_130173.csv"
+archivo_datos_inflacion<-"API_FP.CPI.TOTL.ZG_DS2_en_csv_v2_130173.csv"
 archivo_datos_gdp<-"API_NY.GDP.MKTP.KD.ZG_DS2_en_csv_v2_130026.csv"
 archivo_datos_desempleo<-"API_SL.UEM.TOTL.ZS_DS2_en_csv_v2_130165.csv"
 
-path_inflation<-file.path(data_clean,archivo_datos_inflation)
+path_inflacion<-file.path(data_clean,archivo_datos_inflacion)
 path_gdp<-file.path(data_clean,archivo_datos_gdp)
 path_desempleo<-file.path(data_clean,archivo_datos_desempleo)
 
 ######CARGA DATOS######
 
-inflation <- read.csv(path_inflation,
+inflacion <- read.csv(path_inflacion,
                       skip = 4,
                       header = TRUE)
 
@@ -48,27 +48,27 @@ desempleo <- read.csv(path_desempleo,
 
 ########LIMPIEZA DATOS#########
 
-######INFLATION########
+######inflacion########
 
 #Estructura de los datos
-glimpse(inflation)
+glimpse(inflacion)
 
 #eliminar columnas vacías
-inflation <- inflation[, 1:69] 
+inflacion <- inflacion[, 1:69] 
 
 #cambiar nombres de columnas
-colnames(inflation) <- gsub("^X", "", colnames(inflation))
+colnames(inflacion) <- gsub("^X", "", colnames(inflacion))
 
 #pivotear
 
-inflation_largos  <- inflation %>% 
+inflacion_largos  <- inflacion %>% 
   pivot_longer(cols= 5:69,
                names_to = "anio",               # Nombre de la nueva columna
                values_to = "inflacion",        # Nombre de la columna de valores
                names_transform = list(anio = as.numeric)  # Convertir años a numérico
 )
 #seleccionar variables 
-inflation_largos <- inflation_largos %>% 
+inflacion_largos <- inflacion_largos %>% 
   select('Country.Name','anio','inflacion')
 
 #######GDP#########
@@ -95,7 +95,7 @@ gdp_largos <- gdp_largos %>%
   select('Country.Name','anio','gdp')
 
 
-#######desempleoLOYMENT##########
+#######desempleo##########
 
 #Estructura de los datos
 glimpse(desempleo)
@@ -121,7 +121,7 @@ desempleo_largos <- desempleo_largos %>%
 
 ####Joinear todo en un unico dataset########
 
-data <- inflation_largos %>% 
+data <- inflacion_largos %>% 
   left_join(gdp_largos, by = c("Country.Name", "anio")) %>%
   left_join(desempleo_largos, by = c("Country.Name", "anio"))%>%
   rename("pais"="Country.Name")
@@ -245,7 +245,7 @@ print(tabla_final_completa)
 #####################datos para la serie de tiempo ##############
 
 
-data_serie <- inflation_largos %>%
+data_serie <- inflacion_largos %>%
   left_join(desempleo_largos, by = c("pais", "anio"))
 
 serie_inflacion <- data_serie %>%
