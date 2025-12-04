@@ -72,7 +72,15 @@ p1 <- gg_miss_var(data_paises_sin_outliers, show_pct = TRUE) +
   theme(axis.text.y = element_text(size = 10))
 
 # 5.3 Mostrar grafico de barras
-p1
+ruta_p1 <- paste0(output_figures, "/grafico_barras_faltantes.jpg")
+ggsave(
+  filename = ruta_p1, 
+  plot = p1,
+  width = 12,
+  height = 8,
+  units = "in",
+  dpi = 300
+)
 
 
 # 5.4 Patrón de datos faltantes (heatmap)
@@ -83,7 +91,15 @@ p2 <- vis_miss(data_paises_sin_outliers %>%
        subtitle = "Negro = Faltante, Gris = Observado")
 
 # 5.5 Mostrar grafico heatmap
-p2
+ruta_p2 <- paste0(output_figures, "/grafico_heatmap_faltantes.jpg")
+ggsave(
+  filename = ruta_p2, 
+  plot = p2,
+  width = 12,
+  height = 8,
+  units = "in",
+  dpi = 300
+)
 
 # Combinar gráficos
 p1 / p2

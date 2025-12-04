@@ -62,7 +62,18 @@ p2011_gdp <- ggplot(datos_2011, aes(x = gdp, y = inflacion)) +
     axis.text  = element_text(size = 11)
   )
 
-p2011_desempleo / p2011_gdp
+pd_2011<- p2011_desempleo / p2011_gdp
+
+# 3.5 Se guarda el grafico de dispersion
+ruta_pd_2011 <- paste0(output_figures, "/Dispersion_2011.jpg")
+ggsave(
+  filename = ruta_pd_2011, 
+  plot = pd_2011,
+  width = 12,
+  height = 8,
+  units = "in",
+  dpi = 300
+)
 
 # 3.1.4 Generamos el modelo para el año 2011
 modelo_2011 <- lm(inflacion ~ desempleo + gdp, data = datos_2011)
@@ -128,7 +139,18 @@ p2016_gdp <- ggplot(datos_2016, aes(x = gdp, y = inflacion)) +
     axis.text  = element_text(size = 11)
   )
 
-p2016_desempleo / p2016_gdp
+pd_2016<- p2016_desempleo / p2016_gdp
+
+# 3.5 Se guarda el grafico de dispersion
+ruta_pd_2016 <- paste0(output_figures, "/Dispersion_2016.jpg")
+ggsave(
+  filename = ruta_pd_2016, 
+  plot = pd_2016,
+  width = 12,
+  height = 8,
+  units = "in",
+  dpi = 300
+)
 
 # 3.2.4 Generamos el modelo para el año 2016
 modelo_2016 <- lm(inflacion ~ desempleo + gdp, data = datos_2016)
@@ -193,7 +215,18 @@ p2022_gdp <- ggplot(datos_2022, aes(x = gdp, y = inflacion)) +
     axis.text  = element_text(size = 11)
   )
 
-p2022_desempleo / p2022_gdp
+pd_2022<- p2022_desempleo / p2022_gdp
+
+# 3.5 Se guarda el grafico de dispersion
+ruta_pd_2022 <- paste0(output_figures, "/Dispersion_2022.jpg")
+ggsave(
+  filename = ruta_pd_2022, 
+  plot = pd_2016,
+  width = 12,
+  height = 8,
+  units = "in",
+  dpi = 300
+)
 
 # 3.3.4 Generamos el modelo para el año 2022
 modelo_2022 <- lm(inflacion ~ desempleo + gdp, data = datos_2022)

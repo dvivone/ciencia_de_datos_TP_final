@@ -82,7 +82,18 @@ histo_desempleo<-ggplot(data_paises_estadistica, aes(x = desempleo, fill = anio)
   theme_minimal()
 
 # 3.4 Se muestran los tres histogramas juntos
-histo_infla | histo_gdp | histo_desempleo
+histo_variables<- histo_infla | histo_gdp | histo_desempleo
+
+# 3.5 Se guarda el histograma
+ruta_histo <- paste0(output_figures, "/Histograma_variables.jpg")
+ggsave(
+  filename = ruta_histo, 
+  plot = histo_variables,
+  width = 12,
+  height = 8,
+  units = "in",
+  dpi = 300
+)
 
 # ============================================================
 # 5 SE GUARDAN ESTADISTICAS EN NUEVO FILE

@@ -35,8 +35,8 @@ plot_serie <- ggplot(df_long, aes(x = anio, y = Promedio_Global, color = Variabl
   geom_line(linewidth = 1) +  # Usamos el color mapeado en el aes general
   scale_color_manual(
     name = NULL,
-    values = c("promedio_inflacion" = "darkolivegreen3", "promedio_unemp" = "hotpink1"),
-    labels = c("Inflación", "Desempleo") # Nombres más amigables para la leyenda
+    values = c("promedio_inflacion" = "#feb686", "promedio_desempleo" = "#cda0c9"),
+    labels = c( "Desempleo","Inflación") # Nombres más amigables para la leyenda
   ) +
   labs(
     title = "Evolución de los Promedios Globales",

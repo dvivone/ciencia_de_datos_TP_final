@@ -39,15 +39,14 @@ output_tables<-file.path(r'(output/tables)')
 output_figures<-file.path(r'(output/figures)')
 
 # 3.3 Setear path de files
-path_inflacion<-file.path(data_raw,archivo_datos_inflacion)
-path_gdp<-file.path(data_raw,archivo_datos_gdp)
-path_desempleo<-file.path(data_raw,archivo_datos_desempleo)
-
-# 3.4 Setear nombres de files
 archivo_datos_inflacion<-"API_FP.CPI.TOTL.ZG_DS2_en_csv_v2_130173.csv"
 archivo_datos_gdp<-"API_NY.GDP.MKTP.KD.ZG_DS2_en_csv_v2_130026.csv"
 archivo_datos_desempleo<-"API_SL.UEM.TOTL.ZS_DS2_en_csv_v2_130165.csv"
 
+# 3.4 Setear nombres de files
+path_inflacion<-file.path(data_raw,archivo_datos_inflacion)
+path_gdp<-file.path(data_raw,archivo_datos_gdp)
+path_desempleo<-file.path(data_raw,archivo_datos_desempleo)
 
 
 # ============================================================
