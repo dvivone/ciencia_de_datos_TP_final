@@ -24,6 +24,9 @@ data_paises_bloxpot<-data_paises_completos%>%
   pivot_longer(cols = c(gdp,inflacion,desempleo),
                names_to = "variable")
 
+data_paises_bloxpot %>%
+  summarise(n_distinct(pais))
+
 # 3.2 Se modifica variable para que sea factor
 data_paises_bloxpot$variable <- factor(data_paises_bloxpot$variable,
                                       levels = c("inflacion", "gdp", "desempleo"))
@@ -43,12 +46,13 @@ plot_box <- ggplot(data_paises_bloxpot) +
   ylab(NULL)+
   xlab(NULL)+
   labs(title = "Inflacion, crecimiento del PBI y desempleo",
-       subtitle = "Comparacion de inflacion, crecimiento de PBI y desempleo entre los años 2011, 2016 y 2022")+
+       subtitle = "Comparacion de las distribiciones de inflacion, crecimiento de PBI y desempleo entre los años 2011, 2016 y 2022. Datos correspondientes a 216 paises",
+       caption = "Fuente de datos: World Bank")+
  theme(
     panel.grid.major = element_blank(),  
     panel.grid.minor = element_blank(),
     panel.border = element_rect(color = "grey70", fill = NA),
-    panel.spacing = unit(0.5, "lines")                       
+    panel.spacing = unit(0.5, "lines")
     )
 
 plot_box_sep <- plot_box +
