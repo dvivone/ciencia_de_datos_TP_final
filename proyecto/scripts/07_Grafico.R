@@ -1,45 +1,24 @@
-#librerias
+# ===========================================================
+#               PLOT SERIE DE TIEMPO
+# ============================================================
+
+# ============================================================
+# 1 CARGA DE LIBRERIAS
+# ============================================================
 library(tidyverse)
 library(ggthemes)
 
-#rutas
-instub <- 'data/input'
-outstub <- 'data/output'
+# ============================================================
+# 2 CARGA DE DATOS
+# ============================================================
 
-
-
-path_data_paises<-file.path(data_processed,"data_paises_completos.csv")
-data_paises_completos<-read.csv(path_data_paises)
-
-data_paises_bloxpot<-data_paises_completos%>%
-  pivot_longer(cols = c(gdp,inflacion,unemp),
-               names_to = "variable")
-
-data_paises_bloxpot<-data_paises_bloxpot%>%
-  mutate(variable=factor(levels = c(inflation,gdp,unemp)))
-
-plot_1 <- ggplot(data_paises_bloxpot) + 
-  geom_boxplot(aes(y=value, fill=variable))+
-  facet_wrap(~anio)+
-  scale_y_continuous(labels = percent_format(scale=1))+
-  xlab(NULL)+
-  scale_fill_manual(values = c("#69b3a2","#feb686","#cda0c9"))
-
-
-  plot_1
-
-###############################################################
-
-  ################## PLOT SERIE DE TIEMPO###################
-
-##############################################################
-
-
-####DATOS####
-path_data_serie<-file.path(instub,"data_serie.csv")
+path_data_serie<-file.path(data_clean,"data_serie.csv")
 data_serie <-  read.csv(path_data_serie,
                              header = TRUE)
 
+# ============================================================
+# 3 PIVOT DE DATOS
+# ============================================================
 
 df_long <- data_serie%>%
   pivot_longer(
@@ -48,7 +27,10 @@ df_long <- data_serie%>%
     values_to = "Promedio_Global"     # Mueve los valores a una nueva columna llamada 'Promedio_Global'
   )
 
-#### EL PLOT#####
+# ============================================================
+# 4 GENERAR PLOT
+# ============================================================
+
 plot_serie <- ggplot(df_long, aes(x = anio, y = Promedio_Global, color = Variable)) +
   geom_line(linewidth = 1) +  # Usamos el color mapeado en el aes general
   scale_color_manual(
@@ -69,8 +51,11 @@ plot_serie <- ggplot(df_long, aes(x = anio, y = Promedio_Global, color = Variabl
   )
 
 
-###Guardar
-ruta_serie <- paste0(outstub, "/evolucion_promedios_globales.jpg")
+# ============================================================
+# 5 GUARDAR PLOT
+# ============================================================ 
+
+ruta_serie <- paste0(output_figures, "/evolucion_promedios_globales.jpg")
 ggsave(
   filename = ruta_serie, 
   plot = plot_serie,

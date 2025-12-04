@@ -1,4 +1,11 @@
-# Librerías del proyecto
+# ===========================================================
+#                PREPARACION DE DATOS
+# ============================================================
+
+# ============================================================
+# 1 CARGA DE LIBRERIAS
+# ============================================================
+
 library(tidyverse)
 library(readxl)
 library(lubridate)
@@ -6,132 +13,162 @@ library(scales)
 library(knitr)
 library(kableExtra)
 
-# Limpiar entorno
+# ============================================================
+# 2 LIMPIEZA DE ENTORNO Y CONFIGURACION GLOBAL 
+# ============================================================
+
+# 2.1 Limpieza de entorno
 rm(list = ls())
 
-# Configurar opciones globales
+# 2.2 Configurar opciones globales
 options(stringsAsFactors = FALSE)
 options(scipen = 999)  
 
-#Setear directorio de trabajo
+# ============================================================
+# 3 SETEAR DIRECTORIO DE TRABAJO 
+# ============================================================
+
+# 3.1 Setear directorio de trabajo
 setwd('~/GitHub/ciencia_de_datos_TP_final/proyecto')
 
+# 3.2 Setear subdirectorios
 data_clean<-file.path(r'(data/clean)')
 data_raw<-file.path(r'(data/raw)')
 data_processed<-file.path(r'(data/processed)')
 output_tables<-file.path(r'(output/tables)')
 output_figures<-file.path(r'(output/figures)')
 
-archivo_datos_inflacion<-"API_FP.CPI.TOTL.ZG_DS2_en_csv_v2_130173.csv"
-archivo_datos_gdp<-"API_NY.GDP.MKTP.KD.ZG_DS2_en_csv_v2_130026.csv"
-archivo_datos_desempleo<-"API_SL.UEM.TOTL.ZS_DS2_en_csv_v2_130165.csv"
-
+# 3.3 Setear path de files
 path_inflacion<-file.path(data_raw,archivo_datos_inflacion)
 path_gdp<-file.path(data_raw,archivo_datos_gdp)
 path_desempleo<-file.path(data_raw,archivo_datos_desempleo)
 
-######CARGA DATOS######
+# 3.4 Setear nombres de files
+archivo_datos_inflacion<-"API_FP.CPI.TOTL.ZG_DS2_en_csv_v2_130173.csv"
+archivo_datos_gdp<-"API_NY.GDP.MKTP.KD.ZG_DS2_en_csv_v2_130026.csv"
+archivo_datos_desempleo<-"API_SL.UEM.TOTL.ZS_DS2_en_csv_v2_130165.csv"
 
+
+
+# ============================================================
+# 4 CARGA DE DATOS
+# ============================================================
+
+# 4.1 Se cargan datos de inflación
 inflacion <- read.csv(path_inflacion,
                       skip = 4,
                       header = TRUE)
 
+# 4.2 Se cargan datos de gdp
 gdp <- read.csv(path_gdp,
                 skip=4,
                 header=TRUE)
 
+# 4.3 Se cargan datos de desempleo
 desempleo <- read.csv(path_desempleo,
                   skip=4,
                   header=TRUE)
 
 
-########LIMPIEZA DATOS#########
+# ============================================================
+# 5 LIPIEZA DE DATOS
+# ============================================================
 
-######inflacion########
+# ============================================================
+# 5.1 Inflación
+# ============================================================
 
-#Estructura de los datos
+# 5.1.1. Estructura de los datos
 glimpse(inflacion)
 
-#eliminar columnas vacías
+# 5.1.2. Eliminar columnas vacías
 inflacion <- inflacion[, 1:69] 
 
-#cambiar nombres de columnas
+# 5.1.3. cambiar nombres de columnas
 colnames(inflacion) <- gsub("^X", "", colnames(inflacion))
 
-#pivotear
-
+# 5.1.4. Pivotear
 inflacion_largos  <- inflacion %>% 
   pivot_longer(cols= 5:69,
                names_to = "anio",               # Nombre de la nueva columna
                values_to = "inflacion",        # Nombre de la columna de valores
                names_transform = list(anio = as.numeric)  # Convertir años a numérico
 )
-#seleccionar variables 
+# 5.1.5. Seleccionar variables 
 inflacion_largos <- inflacion_largos %>% 
   select('Country.Name','anio','inflacion')
 
-#######GDP#########
+# ============================================================
+# 5.2 Gdp
+# ============================================================
 
-#Estructura de los datos
+# 5.2.1. Estructura de los datos
 glimpse(gdp)
 
-#eliminar columnas vacías
+# 5.2.2. Eliminar columnas vacías
 gdp <- gdp[, 1:69] 
 
-#cambiar nombres de columnas
+# 5.2.3. cambiar nombres de columnas
 colnames(gdp) <- gsub("^X", "", colnames(gdp))
 
-#pivotear
-
+# 5.2.4. Pivotear
 gdp_largos  <- gdp %>% 
   pivot_longer(cols= 5:69 ,
                names_to = "anio",               # Nombre de la nueva columna
                values_to = "gdp",        # Nombre de la columna de valores
                names_transform = list(anio = as.numeric)  # Convertir años a numérico
 )
-#seleccionar variables 
+# 5.2.5. Seleccionar variables 
 gdp_largos <- gdp_largos %>% 
   select('Country.Name','anio','gdp')
 
 
-#######desempleo##########
+# ============================================================
+# 5.3. Desempleo
+# ============================================================
 
-#Estructura de los datos
+# 5.3.1 Estructura de los datos
 glimpse(desempleo)
 
-#eliminar columnas vacías
+# 5.3.2 Eliminar columnas vacías
 desempleo <- desempleo[, 1:69] 
 
-#cambiar nombres de columnas
+# 5.3.3 cambiar nombres de columnas
 colnames(desempleo) <- gsub("^X", "", colnames(desempleo))
 
-#pivotear
-
+# 5.3.4 Pivotear
 desempleo_largos  <- desempleo %>% 
   pivot_longer(cols= 5:69,
                names_to = "anio",               # Nombre de la nueva columna
                values_to = "desempleo",        # Nombre de la columna de valores
                names_transform = list(anio = as.numeric)  # Convertir años a numérico
 )
-#seleccionar variables 
+# 5.3.5 seleccionar variables 
 desempleo_largos <- desempleo_largos %>% 
   select('Country.Name','anio','desempleo')
 
 
-####Joinear todo en un unico dataset########
+# ============================================================
+# 6 JOINEAR DATASETS
+# ============================================================
 
+# 6.1 Join de datasets
 data <- inflacion_largos %>% 
   left_join(gdp_largos, by = c("Country.Name", "anio")) %>%
   left_join(desempleo_largos, by = c("Country.Name", "anio"))%>%
   rename("pais"="Country.Name")
 
-#Dimensiones del dataset - observaciones disponibles
+# 6.2 Dimensiones del dataset - observaciones disponibles
 glimpse(data)
 
-#Detección inicial de patrones o anomalías
+# 6.3 Detección inicial de patrones o anomalías
 head(data,10)
 
-###Excluir datos de no paises
+# ============================================================
+# 7 LIMPIEZA DATASET
+# ============================================================
+
+# 7.1 Excluir datos de no paises
 regiones_a_excluir <- c(
   "Africa Eastern and Southern",
   "Africa Western and Central",
@@ -181,63 +218,62 @@ regiones_a_excluir <- c(
   "World"
 )
 
-#filtar datos de no paises y se filtran datos para tres años
+# 7.2 filtar datos de no paises y se filtran datos para tres años
 data_paises <- data %>%
   filter(!pais %in% regiones_a_excluir)%>%
   filter(anio %in% c(2011,2016,2022))
 
-  ###########ESTRUCTURA DEL DATA FRAME########
+# ============================================================
+# 8 ESTRUCTURA DEL DATA FRAME 
+# ============================================================
 
 resumen_estructura <- data.frame(
   "Variable" = colnames(data_paises), # Nombres de las columnas
   "Tipo_Dato" = sapply(data_paises, class)  # Tipo de dato de cada columna
 )
 
-
 resumen_columnas <- data.frame(
   "Variable" = colnames(data_paises),
   "Tipo_Dato" = sapply(data_paises, class)
 )
 
-
-# Calculamos las dimensiones
+# 8.3 Calculamos las dimensiones
 num_filas <- nrow(data_paises)
 num_columnas <- ncol(data_paises)
 
-# Creamos la cadena de texto para la fila de resumen
+# 8.4 Creamos la cadena de texto para la fila de resumen
 info_dimensiones <- paste(num_filas, "Filas (Observaciones) x", num_columnas, "Columnas (Variables)")
 
-# Añadimos la nueva fila al resumen
+# 8.5 Añadimos la nueva fila al resumen
 resumen_completo <- resumen_columnas %>%
   tibble::add_row(Variable = "DIMENSIONES TOTALES", Tipo_Dato = info_dimensiones)
 
+# 8.6  
 rownames(resumen_completo) <- NULL
 
-# GENERAR LA TABLA KABLE FINAL
-
+# 8.7 Generar la tabla
 tabla_final_completa <- resumen_completo %>%
- 
   select(Variable, Tipo_Dato) %>%
-  
-  kbl(
-    caption = "Análisis Estructural Completo de data_paises",
-    
-    raw.names = FALSE,
-    col.names = c("Variable", "Tipo de Dato"),
-    align = c('l', 'l')
+  kbl(caption = "Análisis Estructural Completo de data_paises",
+      raw.names = FALSE,
+      col.names = c("Variable", "Tipo de Dato"),
+      align = c('l', 'l')
   ) %>%
-  
-
-  kable_classic_2(full_width = F, html_font = "Cambria") %>%
- 
-  add_header_above(c(" " = 1, "Estructura del Data Frame" = 1)) %>%
-
-  column_spec(1, bold = T, border_right = T) %>%
+  kable_classic_2(full_width = F,
+                  html_font = "Cambria") %>%
+  add_header_above(c(" " = 1,
+                     "Estructura del Data Frame" = 1)) %>%
+  column_spec(1, bold = T,
+              border_right = T) %>%
   column_spec(2, italic = T)
 
+# 8.8 Imprimir tabla
 print(tabla_final_completa)
 
-#Se guardan datos en un nuevo file
+# ============================================================
+# 9 SE GUARDAN ESTADISTICAS EN NUEVO FILE
+# ============================================================
+
 path_data_paises<-file.path(data_clean,"data_paises.csv")
 write.csv(data_paises,path_data_paises,row.names = FALSE)
 

@@ -1,17 +1,33 @@
-#########Evaluación impacto imputación 
+# ===========================================================
+#               EVALUACION DE IMPUTACION
+# ============================================================
+
+# ============================================================
+# 1 CARGA DE LIBRERIAS
+# ============================================================
 
 library(tidyverse)
 library(kableExtra)
 
-data_paises <- read.csv(file.path(data_clean,"data_paises.csv"))
-data_paises_imp <- read.csv(file.path(data_processed,"data_paises_completos.csv"))
+# ============================================================
+# 2 CARGA DE DATOS
+# ============================================================
 
-###Comparacion 
+data_paises <- read.csv(file.path(data_clean,
+                                  "data_paises.csv"))
+data_paises_imp <- read.csv(file.path(data_processed,
+                                      "data_paises_completos.csv"))
 
-# --- 1. Función para calcular las estadísticas ---
+# ============================================================
+# 3 COMPARACION
+# ============================================================
+
+# 3.1 Función para calcular las estadísticas
 calcular_estadisticas <- function(df, nombre_df) {
   df %>%
-    summarise(across(c(inflacion, gdp, desempleo),
+    summarise(across(c(inflacion,
+                       gdp,
+                       desempleo),
                      .fns = list(
                        N = ~sum(!is.na(.)),
                        Media = ~mean(., na.rm = TRUE),
@@ -20,25 +36,34 @@ calcular_estadisticas <- function(df, nombre_df) {
                      ),
                      .names = "{.col}_{.fn}")) %>%
     # Pivotear para tener las variables en filas
-    pivot_longer(everything(), names_to = "Estadistico", values_to = "Valor") %>%
-    separate(Estadistico, into = c("Variable", "Medida"), sep = "_") %>%
-    pivot_wider(names_from = Medida, values_from = Valor) %>%
+    pivot_longer(everything(),
+                 names_to = "Estadistico",
+                 values_to = "Valor") %>%
+    separate(Estadistico,
+             into = c("Variable",
+                      "Medida"),
+             sep = "_") %>%
+    pivot_wider(names_from = Medida,
+                values_from = Valor) %>%
     mutate(Data_Frame = nombre_df) %>%
     # Reordenar columnas para mejor lectura
     select(Data_Frame, Variable, N, Media, Mediana, DesvStd)
 }
 
-# --- 2. Aplicar la función a ambos data frames ---
-stats_paises <- calcular_estadisticas(data_paises, "data_paises")
-stats_paises_imp <- calcular_estadisticas(data_paises_imp, "data_paises_imp")
+# 3.2. Aplicar la función a ambos data frames ---
+stats_paises <- calcular_estadisticas(data_paises,
+                                      "data_paises")
+stats_paises_imp <- calcular_estadisticas(data_paises_imp, 
+                                          "data_paises_imp")
 
-# --- 3. Combinar los resultados en una sola tabla de comparación ---
-tabla_comparativa <- bind_rows(stats_paises, stats_paises_imp) %>%
+# 3.3 Combinar los resultados en una sola tabla de comparación ---
+tabla_comparativa <- bind_rows(stats_paises,
+                               stats_paises_imp) %>%
   pivot_wider(names_from = Data_Frame,
               values_from = c(N, Media, Mediana, DesvStd),
               names_sep = "_")
 
-# --- 4. Cuantificar la alteración (Cambio Porcentual Relativo en la Media) ---
+# 3.4 Cuantificar la alteración (Cambio Porcentual Relativo en la Media) ---
 # Usamos la Media como indicador principal de alteración para simplificar
 tabla_alteracion <- tabla_comparativa %>%
   mutate(
@@ -84,7 +109,7 @@ tabla_alteracion <- tabla_comparativa %>%
 
 
 
-########kablee
+# 3.5 Tabla comparacion
 tabla_alteracion %>%
   # Formatear números a 2 decimales
   mutate(across(starts_with(c("Media", "Mediana", "DesvStd")), ~ round(., 2))) %>%

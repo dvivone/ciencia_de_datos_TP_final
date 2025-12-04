@@ -1,35 +1,38 @@
 # ===========================================================
-#             REGRESION PARA AÑOS 2011, 2016 y 2022
+#        PLOT -  COMPARACION DE VARIABLES EN 3 PERIODOS
 # ============================================================
 
 # ============================================================
-# CARGA DE LIBRERIAS
+# 1 CARGA DE LIBRERIAS
 # ============================================================
+
+library(tidyverse)
 library(cowplot)
+
 # ============================================================
-# CARGA DE DATOS
+# 2 CARGA DE DATOS
 # ============================================================
 
 path_data_paises<-file.path(data_processed,"data_paises_completos.csv")
 data_paises_completos<-read.csv(path_data_paises)
 
 # ============================================================
-# SE PIVOTEAN DATOS
+# 3 SE PIVOTEAN DATOS
 # ============================================================
 
 data_paises_bloxpot<-data_paises_completos%>%
   pivot_longer(cols = c(gdp,inflacion,desempleo),
                names_to = "variable")
 
-#Se modifica variable para que sea factor
+# 3.2 Se modifica variable para que sea factor
 data_paises_bloxpot$variable <- factor(data_paises_bloxpot$variable,
                                       levels = c("inflacion", "gdp", "desempleo"))
 
 # ============================================================
-# SE GENERA GRAFICO
+# 4 SE GENERA PLOT
 # ============================================================
 
-plot_1 <- ggplot(data_paises_bloxpot) + 
+plot_box <- ggplot(data_paises_bloxpot) + 
   geom_boxplot(aes(x=variable,y=value, fill=variable)) +
   facet_wrap(~anio,
              strip.position = "bottom",
@@ -48,16 +51,7 @@ plot_1 <- ggplot(data_paises_bloxpot) +
     panel.spacing = unit(0.5, "lines")                       
     )
 
-#plot_1_sep <- ggdraw(plot_1) +
- #   draw_line(
-  #    x = c(63/100, 63/100), y = c(0, 0.9),
-   #   linetype = "dashed",
-    #  color = "red",
-     # size = 0.8
-    #)
-
-
-plot_1_sep <- plot_1 +
+plot_box_sep <- plot_box +
   geom_text(
     data = subset(data_paises_bloxpot, anio == 2022 & variable == "inflacion"),
     aes(x = variable, y = 20, label = "Inflación mas elevada en post-pandemia"),
@@ -68,5 +62,21 @@ plot_1_sep <- plot_1 +
     nudge_x = 0.5
   )
 
-plot_1_sep
+plot_box_sep
+
+
+# ============================================================
+# 5 GUARDAR PLOT
+# ============================================================ 
+
+ruta_boxplot <- paste0(output_figures, "/comparacion_variables.jpg")
+ggsave(
+  filename = ruta_boxplot, 
+  plot = plot_box_sep,
+  width = 18,
+  height = 10,
+  units = "in",
+  dpi = 300,
+  limitsize = FALSE
+)
   
