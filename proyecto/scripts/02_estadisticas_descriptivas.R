@@ -43,6 +43,17 @@ estadisticas_paises_largo<- estadisticas_paises_largo%>%
   arrange(variable,anio)
 estadisticas_paises_largo
 
+estadisticas_paises_largo %>% kable(
+  format = "html",              
+  caption = "Estadísticas descriptivas", 
+  align = 'l'                  
+) %>%
+  kable_styling(
+    bootstrap_options = "striped", 
+    full_width = FALSE             
+  )
+
+
 # ============================================================
 # 3 HISTOGRAMAS PARA VERIFICAR DISTRIBUCION DE VARIABLES
 # ============================================================
