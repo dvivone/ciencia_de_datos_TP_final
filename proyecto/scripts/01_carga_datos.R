@@ -28,8 +28,25 @@ options(scipen = 999)
 # 3 SETEAR DIRECTORIO DE TRABAJO 
 # ============================================================
 
-# 3.1 Setear directorio de trabajo
-setwd('~/GitHub/ciencia_de_datos_TP_final/proyecto')
+# 3. Setear directorio de trabajo
+#setwd('~/GitHub/ciencia_de_datos_TP_final/proyecto')
+
+# 3.1 Crear directorios si no existen
+
+dirs_crear <- c(
+  file.path("data", "clean"),
+  file.path("data", "processed"),
+  file.path("data", "raw"),
+  file.path("outputs", "figures"),
+  file.path("outputs", "tables")
+)
+
+# 2. Iterar sobre las rutas y crear los directorios
+for (dir in dirs_crear) {
+  if (!dir.exists(dir)) {
+    dir.create(dir, recursive = TRUE, showWarnings = FALSE)
+  }
+}
 
 # 3.2 Setear subdirectorios
 data_clean<-file.path(r'(data/clean)')
